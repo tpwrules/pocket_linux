@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "nix-litex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1660324590,
+        "narHash": "sha256-/GvZvNYgkqsFgu1ri0esSJsO+XGLwFiWOGT0fjCfVTw=",
+        "ref": "main",
+        "rev": "b9498679d45b9c6a7583218422c7d8d4746d0a78",
+        "revCount": 58,
+        "type": "git",
+        "url": "https://git.sr.ht/~lschuermann/nix-litex"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://git.sr.ht/~lschuermann/nix-litex"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1662911228,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "nix-litex": "nix-litex",
         "nixpkgs": "nixpkgs"
       }
     }

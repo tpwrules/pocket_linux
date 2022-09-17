@@ -19,15 +19,19 @@ from litex.soc.integration.soc_core import *
 from litex.soc.integration.builder import *
 
 from litedram.modules import AS4C32M16
-from litedram.phy import GENSDRPHY
+from litedram.phy import GENSDRPHY, HalfRateGENSDRPHY
 
 # CRG ----------------------------------------------------------------------------------------------
 
 class _CRG(Module):
-    def __init__(self, platform, sys_clk_freq):
+    def __init__(self, platform, sys_clk_freq, sdram_rate="1:1"):
         self.rst = Signal()
         self.clock_domains.cd_sys    = ClockDomain()
-        self.clock_domains.cd_sys_ps = ClockDomain()
+        if sdram_rate == "1:2":
+            self.clock_domains.cd_sys2x    = ClockDomain()
+            self.clock_domains.cd_sys2x_ps = ClockDomain()
+        else:
+            self.clock_domains.cd_sys_ps = ClockDomain()
 
         # # #
 
@@ -39,18 +43,25 @@ class _CRG(Module):
         self.comb += pll.reset.eq(self.rst)
         pll.register_clkin(clk74p25, 74.25e6)
         pll.create_clkout(self.cd_sys,    sys_clk_freq)
-        pll.create_clkout(self.cd_sys_ps, sys_clk_freq, phase=90)
+        if sdram_rate == "1:2":
+            pll.create_clkout(self.cd_sys2x,    2*sys_clk_freq)
+            # allegedly the phase should be 90 degrees but the ram doesn't work
+            # unless set to 180
+            pll.create_clkout(self.cd_sys2x_ps, 2*sys_clk_freq, phase=180)
+        else:
+            pll.create_clkout(self.cd_sys_ps, sys_clk_freq, phase=90)
 
-        self.specials += DDROutput(1, 0, platform.request("sdram_clock"), ClockSignal("sys_ps"))
+        sdram_clk = ClockSignal("sys2x_ps" if sdram_rate == "1:2" else "sys_ps")
+        self.specials += DDROutput(1, 0, platform.request("sdram_clock"), sdram_clk)
 
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq=int(50e6), **kwargs):
+    def __init__(self, sys_clk_freq=int(50e6), sdram_rate="1:1", **kwargs):
         platform = analogue_pocket.Platform()
 
         # CRG --------------------------------------------------------------------------------------
-        self.submodules.crg = _CRG(platform, sys_clk_freq)
+        self.submodules.crg = _CRG(platform, sys_clk_freq, sdram_rate=sdram_rate)
 
         # SoCCore ----------------------------------------------------------------------------------
         # Defaults to JTAG-UART since no hardware UART.
@@ -60,10 +71,11 @@ class BaseSoC(SoCCore):
         SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on Analogue Pocket", **kwargs)
 
         # SDR SDRAM --------------------------------------------------------------------------------
-        self.submodules.sdrphy = GENSDRPHY(platform.request("sdram"), sys_clk_freq)
+        sdrphy_cls = HalfRateGENSDRPHY if sdram_rate == "1:2" else GENSDRPHY
+        self.submodules.sdrphy = sdrphy_cls(platform.request("sdram"), sys_clk_freq)
         self.add_sdram("sdram",
             phy           = self.sdrphy,
-            module        = AS4C32M16(sys_clk_freq, "1:1"),
+            module        = AS4C32M16(sys_clk_freq, sdram_rate),
             l2_cache_size = kwargs.get("l2_size", 8192)
         )
 
@@ -76,12 +88,14 @@ def main():
     target_group.add_argument("--build",                      action="store_true", help="Build design.")
     target_group.add_argument("--load",                       action="store_true", help="Load bitstream.")
     target_group.add_argument("--sys-clk-freq",               default=50e6,        help="System clock frequency.")
+    target_group.add_argument("--sdram-rate",                 default="1:1",       help="SDRAM Rate (1:1 Full Rate or 1:2 Half Rate).")
     builder_args(parser)
     soc_core_args(parser)
     args = parser.parse_args()
 
     soc = BaseSoC(
         sys_clk_freq               = int(float(args.sys_clk_freq)),
+        sdram_rate                 = args.sdram_rate,
         **soc_core_argdict(args)
     )
     builder = Builder(soc, **builder_argdict(args))

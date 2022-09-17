@@ -40,12 +40,18 @@
           litex-boards
           litedram
           litespi
+          pythondata-cpu-vexriscv
           pythondata-cpu-vexriscv_smp
+          pythondata-software-compiler_rt
+          pythondata-software-picolibc
           pyvcd
         ]))
 
+        pkgs.meson
+        pkgs.ninja
         pkgs.pkgsCross.riscv64.buildPackages.gcc
 
+        pkgs.openocd
         (pkgs.quartus-prime-lite.override {
           supportedDevices = [ "Cyclone V" ];
         })

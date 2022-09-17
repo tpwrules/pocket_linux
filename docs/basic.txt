@@ -1,0 +1,14 @@
+# enter the development environment
+# (this will automatically download and install quartus,
+#  so expect it to take a while the first time)
+# you will also need to install usb blaster udev rules
+
+nix develop --profile profiles/dev
+cd src
+
+# load the core template onto the pocket and start it so you see
+# a dark gray screen
+
+python3 -m litex_ext.targets.analogue_pocket --no-ident-version --build --load
+
+litex_term --jtag-config pocket_term.cfg jtag

@@ -24,7 +24,13 @@
           inherit (nix-litex-pkgs) sbt-mkDerivation;
 
           python3 = prev.python3.override {
-            packageOverrides = nix-litex-pkgs.pythonOverlay;
+            packageOverrides = prev.lib.composeExtensions nix-litex-pkgs.pythonOverlay (p-final: p-prev: {
+              litex-unchecked = p-prev.litex-unchecked.overrideAttrs (o: {
+                patches = (o.patches or []) ++ [
+                  ./nix/patches/litex-improve-jtagstream-transmission.patch
+                ];
+              });
+            });
           };
         })
       ];
@@ -45,6 +51,7 @@
           pythondata-software-compiler_rt
           pythondata-software-picolibc
           pyvcd
+          pyserial
         ]))
 
         pkgs.meson

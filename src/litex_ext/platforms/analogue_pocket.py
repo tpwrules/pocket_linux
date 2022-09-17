@@ -15,6 +15,27 @@ _io = [
     # Clk / Rst
     ("clk74p25", 0, Pins("V15"), IOStandard("3.3-V LVCMOS")),
     ("clk74p25", 1, Pins("H16"), IOStandard("1.8 V")),
+
+    # SDR SDRAM
+    ("sdram_clock", 0, Pins("G12"), IOStandard("1.8 V"),
+        Misc("OUTPUT_TERMINATION \"SERIES 50 OHM WITHOUT CALIBRATION\"")),
+    ("sdram", 0,
+        Subsignal("cke", Pins("G18")),
+        Subsignal("a",   Pins(
+            "D17 D12 F12 E14 F13 E16 E15 F14",
+            "J18 G17 C13 F15 J17")),
+        Subsignal("dq",  Pins(
+            "C15 B15 A15 B13 A14 B12 A13 A12",
+            "J13 G15 G16 G13 H13 J19 G11 K20"),
+            ),
+        Subsignal("dm", Pins("D13 H18")),
+        Subsignal("ba",    Pins("C16 E12")),
+        Subsignal("cas_n", Pins("B16")),
+        Subsignal("ras_n", Pins("B11")),
+        Subsignal("we_n",  Pins("C11")),
+        Misc("CURRENT_STRENGTH_NEW \"4MA\""),
+        IOStandard("1.8 V"),
+    ),
 ]
 
 # Platform -----------------------------------------------------------------------------------------

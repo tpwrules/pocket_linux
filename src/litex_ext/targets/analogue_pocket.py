@@ -9,6 +9,8 @@
 
 from migen import *
 
+from litex.build.io import DDROutput
+
 from litex_ext.platforms import analogue_pocket
 
 from litex.soc.cores.clock import CycloneVPLL
@@ -16,12 +18,16 @@ from litex.soc.integration.soc import SoCRegion
 from litex.soc.integration.soc_core import *
 from litex.soc.integration.builder import *
 
+from litedram.modules import AS4C32M16
+from litedram.phy import GENSDRPHY
+
 # CRG ----------------------------------------------------------------------------------------------
 
 class _CRG(Module):
     def __init__(self, platform, sys_clk_freq):
         self.rst = Signal()
         self.clock_domains.cd_sys    = ClockDomain()
+        self.clock_domains.cd_sys_ps = ClockDomain()
 
         # # #
 
@@ -33,6 +39,9 @@ class _CRG(Module):
         self.comb += pll.reset.eq(self.rst)
         pll.register_clkin(clk74p25, 74.25e6)
         pll.create_clkout(self.cd_sys,    sys_clk_freq)
+        pll.create_clkout(self.cd_sys_ps, sys_clk_freq, phase=90)
+
+        self.specials += DDROutput(1, 0, platform.request("sdram_clock"), ClockSignal("sys_ps"))
 
 # BaseSoC ------------------------------------------------------------------------------------------
 
@@ -49,6 +58,14 @@ class BaseSoC(SoCCore):
         if real_uart_name == "serial":
             kwargs["uart_name"] = "jtag_uart"
         SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on Analogue Pocket", **kwargs)
+
+        # SDR SDRAM --------------------------------------------------------------------------------
+        self.submodules.sdrphy = GENSDRPHY(platform.request("sdram"), sys_clk_freq)
+        self.add_sdram("sdram",
+            phy           = self.sdrphy,
+            module        = AS4C32M16(sys_clk_freq, "1:1"),
+            l2_cache_size = kwargs.get("l2_size", 8192)
+        )
 
 # Build --------------------------------------------------------------------------------------------
 

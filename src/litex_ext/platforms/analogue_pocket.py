@@ -46,6 +46,10 @@ class Platform(AlteraPlatform):
 
     def __init__(self, toolchain="quartus"):
         AlteraPlatform.__init__(self, "5CEBA4F23C8", _io, toolchain=toolchain)
+        self.toolchain.additional_sdc_commands.extend([
+            f"create_clock -period {1e9/6e6:.3f} [get_ports {{altera_reserved_tck}}]",
+            "set_clock_groups -asynchronous -group {altera_reserved_tck}"
+        ])
 
     def create_programmer(self):
         return USBBlaster()

@@ -100,8 +100,8 @@ class Board:
 class Pocket(Board):
     soc_kwargs = {
         "l2_size"           : 2048, # Use Wishbone and L2 for memory accesses.
-        "integrated_rom_size": 0x7000,
-        "integrated_sram_size": 0xb00,
+        # size needs to be a power of 2 so quartus will infer the memory properly
+        "integrated_sram_size": 0x1000,
         "uart_name"         : "jtag_uart",
         # optimal speed to make the jtag uart downloading work properly...
         "sys_clk_freq"      : 70e6,

@@ -1,0 +1,19 @@
+# enter the development environment
+# (this will automatically download and install quartus,
+#  so expect it to take a while the first time)
+# you will also need to install usb blaster udev rules
+
+nix develop --extra-experimental-features 'nix-command flakes' --profile profiles/dev
+cd src
+
+mkdir images
+wget https://github.com/litex-hub/linux-on-litex-vexriscv/files/8331338/linux_2022_03_23.zip
+unzip -d images linux_2022_03_23.zip
+
+# load the core template onto the pocket and start it so you see
+# a dark gray screen. plug the usb blaster into the jtag port
+
+python3 linux.py --build --load
+
+# this will take quite some time to download...
+litex_term --jtag-config pocket_term.cfg jtag --images=images/boot.json

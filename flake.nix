@@ -58,6 +58,8 @@
         pkgs.meson
         pkgs.ninja
         pkgs.pkgsCross.riscv64.buildPackages.gcc
+        pkgs.dtc
+        pkgs.unzip
 
         pkgs.openocd
         (pkgs.quartus-prime-lite.override {

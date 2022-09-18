@@ -1,16 +1,22 @@
 # enter the development environment
 # (this will automatically download and install quartus,
 #  so expect it to take a while the first time)
-# you will also need to install usb blaster udev rules
+# you will also need to install usb blaster udev rules:
+#   https://gist.github.com/gmarkall/6f0a1c16476e8e0a9026
 
-nix develop --profile profiles/dev
+# clone the repo and cd into it
+
+nix develop --extra-experimental-features 'nix-command flakes' --profile profiles/dev -L -j4
 cd src
 
 # load the core template onto the pocket and start it so you see
 # a dark gray screen
 
+# compile the design and program the fpga sram
 python3 -m litex_ext.targets.analogue_pocket --no-ident-version --build --load
 
+# compile the demo software
 litex_bare_metal_demo --build-path build/analogue_pocket/
 
+# open a terminal over jtag and upload the demo software
 litex_term --jtag-config pocket_term.cfg jtag --kernel=demo.bin

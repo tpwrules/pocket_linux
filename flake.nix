@@ -28,6 +28,7 @@
               litex-unchecked = p-prev.litex-unchecked.overrideAttrs (o: {
                 patches = (o.patches or []) ++ [
                   ./nix/patches/litex-improve-jtagstream-transmission.patch
+                  ./nix/patches/litex-fix-demo-build.patch
                 ];
               });
             });

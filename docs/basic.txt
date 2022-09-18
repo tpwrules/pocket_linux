@@ -11,4 +11,6 @@ cd src
 
 python3 -m litex_ext.targets.analogue_pocket --no-ident-version --build --load
 
-litex_term --jtag-config pocket_term.cfg jtag
+litex_bare_metal_demo --build-path build/analogue_pocket/
+
+litex_term --jtag-config pocket_term.cfg jtag --kernel=demo.bin

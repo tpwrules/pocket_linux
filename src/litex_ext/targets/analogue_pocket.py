@@ -12,6 +12,7 @@ from migen import *
 from litex.build.io import DDROutput
 
 from litex_ext.platforms import analogue_pocket
+from litex_ext.cores.video import VideoPocketPHY
 
 from litex.soc.cores.clock import CycloneVPLL
 from litex.soc.integration.soc import SoCRegion
@@ -27,6 +28,8 @@ class _CRG(Module):
     def __init__(self, platform, sys_clk_freq, sdram_rate="1:1"):
         self.rst = Signal()
         self.clock_domains.cd_sys    = ClockDomain()
+        self.clock_domains.cd_vid    = ClockDomain()
+        self.clock_domains.cd_vid_90 = ClockDomain()
         if sdram_rate == "1:2":
             self.clock_domains.cd_sys2x    = ClockDomain()
             self.clock_domains.cd_sys2x_ps = ClockDomain()
@@ -42,14 +45,19 @@ class _CRG(Module):
         self.submodules.pll = pll = CycloneVPLL(speedgrade="-C8")
         self.comb += pll.reset.eq(self.rst)
         pll.register_clkin(clk74p25, 74.25e6)
-        pll.create_clkout(self.cd_sys,    sys_clk_freq)
+        # there's something wrong with litex's pll generation and it generates
+        # clocks quartus is not happy with. remedy this by taking the ones it
+        # says are valid and using those exactly
+        pll.create_clkout(self.cd_sys,    70312570) # ~70MHz (assuming linux!!!)
+        pll.create_clkout(self.cd_vid, 24949621) # ~25MHz
+        pll.create_clkout(self.cd_vid_90, 24949621, phase=90)
         if sdram_rate == "1:2":
-            pll.create_clkout(self.cd_sys2x,    2*sys_clk_freq)
+            pll.create_clkout(self.cd_sys2x,    2*70312570)
             # allegedly the phase should be 90 degrees but the ram doesn't work
             # unless set to 180
-            pll.create_clkout(self.cd_sys2x_ps, 2*sys_clk_freq, phase=180)
+            pll.create_clkout(self.cd_sys2x_ps, 2*70312570, phase=180)
         else:
-            pll.create_clkout(self.cd_sys_ps, sys_clk_freq, phase=90)
+            pll.create_clkout(self.cd_sys_ps, 70312570, phase=90)
 
         sdram_clk = ClockSignal("sys2x_ps" if sdram_rate == "1:2" else "sys_ps")
         self.specials += DDROutput(1, 0, platform.request("sdram_clock"), sdram_clk)
@@ -78,6 +86,11 @@ class BaseSoC(SoCCore):
             module        = AS4C32M16(sys_clk_freq, sdram_rate),
             l2_cache_size = kwargs.get("l2_size", 8192)
         )
+
+        # Video
+
+        self.submodules.videophy = VideoPocketPHY(platform.request("vid"), clock_domain="vid")
+        self.add_video_colorbars(phy=self.videophy, timings="640x480@60Hz", clock_domain="vid")
 
 # Build --------------------------------------------------------------------------------------------
 

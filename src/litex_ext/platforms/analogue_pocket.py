@@ -36,6 +36,20 @@ _io = [
         Misc("CURRENT_STRENGTH_NEW \"4MA\""),
         IOStandard("1.8 V"),
     ),
+
+    # scaler video connection
+    ("vid", 0,
+        Subsignal("clk", Pins("R17")),
+        Subsignal("de", Pins("N20")),
+        Subsignal("skip", Pins("N21")),
+        Subsignal("hsync", Pins("P17")),
+        Subsignal("vsync", Pins("T15")),
+        Subsignal("data", Pins(
+            "R21 P22 N16 P18 P19 T20 T19 T18 T22 R22 R15 R16"
+        )),
+        Misc("OUTPUT_TERMINATION \"SERIES 50 OHM WITHOUT CALIBRATION\""),
+        IOStandard("1.8 V"),
+    ),
 ]
 
 # Platform -----------------------------------------------------------------------------------------

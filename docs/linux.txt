@@ -13,8 +13,9 @@ mkdir images
 wget https://github.com/litex-hub/linux-on-litex-vexriscv/files/8331338/linux_2022_03_23.zip
 unzip -d images linux_2022_03_23.zip
 
-# load the core template onto the pocket and start it so you see
-# a dark gray screen. plug the usb blaster into the jtag port
+# load the core template onto the pocket, edit the video json to 640x480, and
+# start it so you see a dark gray screen and some garbage.
+# plug the usb blaster into the jtag port
 
 # compile the design and program the fpga sram
 python3 linux.py --build --load

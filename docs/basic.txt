@@ -9,8 +9,8 @@
 nix develop --extra-experimental-features 'nix-command flakes' --profile profiles/dev -L -j4
 cd src
 
-# load the core template onto the pocket and start it so you see
-# a dark gray screen
+# load the core template onto the pocket, edit the video json to 640x480, and
+# start it so you see a dark gray screen and some garbage
 
 # compile the design and program the fpga sram
 python3 -m litex_ext.targets.analogue_pocket --no-ident-version --build --load

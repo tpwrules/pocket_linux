@@ -59,6 +59,9 @@ class _CRG(Module):
         else:
             pll.create_clkout(self.cd_sys_ps, 70312570, phase=90)
 
+        # ignore false path probably created by CSRs
+        platform.add_false_path_constraint(self.cd_sys.clk, self.cd_vid.clk)
+
         sdram_clk = ClockSignal("sys2x_ps" if sdram_rate == "1:2" else "sys_ps")
         self.specials += DDROutput(1, 0, platform.request("sdram_clock"), sdram_clk)
 

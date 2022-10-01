@@ -31,6 +31,7 @@
                   ./nix/patches/litex-fix-demo-build.patch
                   ./nix/patches/litex-fix-framebuffer-colors.patch
                   ./nix/patches/litex-nice-litex-term.patch
+                  ./nix/patches/litex-fix-quartus-clock-constraining.patch
                 ];
               });
             });

@@ -45,19 +45,16 @@ class _CRG(Module):
         self.submodules.pll = pll = CycloneVPLL(speedgrade="-C8")
         self.comb += pll.reset.eq(self.rst)
         pll.register_clkin(clk74p25, 74.25e6)
-        # there's something wrong with litex's pll generation and it generates
-        # clocks quartus is not happy with. remedy this by taking the ones it
-        # says are valid and using those exactly
-        pll.create_clkout(self.cd_sys,    70312570) # ~70MHz (assuming linux!!!)
-        pll.create_clkout(self.cd_vid, 24949621) # ~25MHz
-        pll.create_clkout(self.cd_vid_90, 24949621, phase=90)
+        pll.create_clkout(self.cd_sys, sys_clk_freq)
+        pll.create_clkout(self.cd_vid, 25e6)
+        pll.create_clkout(self.cd_vid_90, 25e6, phase=90)
         if sdram_rate == "1:2":
-            pll.create_clkout(self.cd_sys2x,    2*70312570)
+            pll.create_clkout(self.cd_sys2x,    2*sys_clk_freq)
             # allegedly the phase should be 90 degrees but the ram doesn't work
             # unless set to 180
-            pll.create_clkout(self.cd_sys2x_ps, 2*70312570, phase=180)
+            pll.create_clkout(self.cd_sys2x_ps, 2*sys_clk_freq, phase=180)
         else:
-            pll.create_clkout(self.cd_sys_ps, 70312570, phase=90)
+            pll.create_clkout(self.cd_sys_ps, sys_clk_freq, phase=90)
 
         # ignore false path probably created by CSRs
         platform.add_false_path_constraint(self.cd_sys.clk, self.cd_vid.clk)

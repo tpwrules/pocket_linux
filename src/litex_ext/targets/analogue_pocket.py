@@ -91,7 +91,7 @@ class BaseSoC(SoCCore):
         # Video
 
         self.submodules.videophy = VideoPocketPHY(platform.request("vid"), clock_domain="vid")
-        self.add_video_colorbars(phy=self.videophy, timings="640x480@60Hz", clock_domain="vid")
+        self.add_video_framebuffer(phy=self.videophy, timings="640x480@60Hz", clock_domain="vid", format="rgb565")
 
 # Build --------------------------------------------------------------------------------------------
 

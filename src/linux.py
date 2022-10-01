@@ -103,8 +103,10 @@ class Pocket(Board):
         # size needs to be a power of 2 so quartus will infer the memory properly
         "integrated_sram_size": 0x1000,
         "uart_name"         : "jtag_uart",
-        # optimal speed to make the jtag uart downloading work properly...
-        "sys_clk_freq"      : 70e6,
+        # run the SDRAM at double speed so there's enough bandwidth for the
+        # framebuffer
+        "sys_clk_freq"      : 75e6,
+        "sdram_rate"        : "1:2",
         # for reproducibility
         "no_ident_version"  : True,
     }

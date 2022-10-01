@@ -1,0 +1,62 @@
+diff --git a/litex/tools/litex_term.py b/litex/tools/litex_term.py
+index a0e76ad9..9158d92a 100755
+--- a/litex/tools/litex_term.py
++++ b/litex/tools/litex_term.py
+@@ -433,12 +433,9 @@ class LiteXTerm:
+ 
+         # Upload calibration
+         if not self.safe:
+-            self.upload_calibration(address)
+-            # Force safe mode settings when calibration fails.
+-            if self.delay is None:
+-                self.delay       = 0
+-                self.length      = 64
+-                self.outstanding = 0
++            self.delay       = 1e-5
++            self.length      = 128
++            self.outstanding = 8
+ 
+         # Prepare parameters
+         current_address = address
+@@ -446,13 +443,17 @@ class LiteXTerm:
+         start           = time.time()
+         remaining       = length
+         outstanding     = 0
++        lp = None
+         while remaining:
+-            # Show progress
+-            sys.stdout.write("|{}>{}| {}%\r".format(
+-                "=" * (20*position//length),
+-                " " * (20-20*position//length),
+-                100*position//length))
+-            sys.stdout.flush()
++            p = 100*position//length
++            if p != lp:
++                # Show progress
++                sys.stdout.write("|{}>{}| {}%\r".format(
++                    "=" * (p//5),
++                    " " * (20-(p//5)),
++                    p))
++                sys.stdout.flush()
++                lp = p
+ 
+             # Send frame if max outstanding not reached.
+             if outstanding <= self.outstanding:
+@@ -472,15 +473,14 @@ class LiteXTerm:
+                 remaining       -= len(frame_data)
+                 outstanding     += 1
+ 
+-                # Inter-frame delay.
+-                time.sleep(self.delay)
++            # Inter-frame delay.
++            time.sleep(self.delay)
+ 
+             # Read response if available.
+             while self.port.in_waiting:
+                 ack = self.receive_upload_response()
+                 if ack:
+                     outstanding -= 1
+-                    break
+ 
+         # Get remaining responses.
+         for _ in range(outstanding):

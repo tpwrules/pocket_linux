@@ -30,6 +30,7 @@
                   ./nix/patches/litex-improve-jtagstream-transmission.patch
                   ./nix/patches/litex-fix-demo-build.patch
                   ./nix/patches/litex-fix-framebuffer-colors.patch
+                  ./nix/patches/litex-nice-litex-term.patch
                 ];
               });
             });

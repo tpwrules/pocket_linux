@@ -76,6 +76,7 @@ class BaseSoC(SoCCore):
         real_uart_name = kwargs["uart_name"]
         if real_uart_name == "serial":
             kwargs["uart_name"] = "jtag_uart"
+        kwargs["uart_fifo_depth"] = 1024 # one BRAM's worth in each direction
         SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on Analogue Pocket", **kwargs)
 
         # SDR SDRAM --------------------------------------------------------------------------------

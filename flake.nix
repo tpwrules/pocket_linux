@@ -13,7 +13,7 @@
     pleaseKeepMyInputs = pkgs.writeTextDir "bin/.please-keep-my-inputs"
       (builtins.concatStringsSep " " (builtins.attrValues inputs));
 
-    nix-litex-pkgs = (import nix-litex { inherit pkgs; sbtNixpkgs = pkgs; skipChecks = true; });
+    nix-litex-pkgs = (import nix-litex { inherit pkgs; skipChecks = true; });
 
     pkgs = import nixpkgs {
       inherit system;
@@ -21,18 +21,14 @@
       overlays = [
         (import ./nix/overlay.nix)
         (final: prev: {
-          inherit (nix-litex-pkgs) sbt-mkDerivation;
+          inherit (nix-litex-pkgs) mkSbtDerivation;
 
           python3 = prev.python3.override {
             packageOverrides = prev.lib.composeExtensions nix-litex-pkgs.pythonOverlay (p-final: p-prev: {
               litex-unchecked = p-prev.litex-unchecked.overrideAttrs (o: {
                 patches = (o.patches or []) ++ [
                   ./nix/patches/litex-improve-jtagstream-transmission.patch
-                  ./nix/patches/litex-fix-demo-build.patch
-                  ./nix/patches/litex-fix-framebuffer-colors.patch
                   ./nix/patches/litex-nice-litex-term.patch
-                  ./nix/patches/litex-fix-quartus-clock-constraining.patch
-                  ./nix/patches/litex-fix-pll-stuff.patch
                 ];
               });
             });
@@ -57,6 +53,8 @@
           pythondata-software-picolibc
           pyvcd
           pyserial
+          requests
+          packaging
         ]))
 
         pkgs.meson

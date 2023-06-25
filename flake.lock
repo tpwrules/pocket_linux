@@ -3,11 +3,11 @@
     "nix-litex": {
       "flake": false,
       "locked": {
-        "lastModified": 1660324590,
-        "narHash": "sha256-/GvZvNYgkqsFgu1ri0esSJsO+XGLwFiWOGT0fjCfVTw=",
+        "lastModified": 1680613941,
+        "narHash": "sha256-44xYapHRk8DQZe3dz3fe29tnjkWkLk7nwkzevL7o38c=",
         "ref": "main",
-        "rev": "b9498679d45b9c6a7583218422c7d8d4746d0a78",
-        "revCount": 58,
+        "rev": "45d2fc928ba70dc1bb95aa77387497fae8512c78",
+        "revCount": 66,
         "type": "git",
         "url": "https://git.sr.ht/~lschuermann/nix-litex"
       },
@@ -19,11 +19,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1662911228,
-        "narHash": "sha256-oJOrB2lEeBLaO8g1DKG5PK9a1zyOWypkscrEfxxEj8A=",
+        "lastModified": 1687502512,
+        "narHash": "sha256-dBL/01TayOSZYxtY4cMXuNCBk8UMLoqRZA+94xiFpJA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c97e777ff06fcb8d37dcdf5e21e9eff1f34f0e90",
+        "rev": "3ae20aa58a6c0d1ca95c9b11f59a2d12eebc511f",
         "type": "github"
       },
       "original": {
